@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow · 专注当下 ✨</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- Tailwind 配置 - 治愈系柔和配色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'warm-cream': '#FDF8F3',
+                        'soft-pink': '#F8E8E8',
+                        'soft-blue': '#E8F0F5',
+                        'soft-green': '#E8F5E9',
+                        'warm-primary': '#D4A5A5',
+                        'warm-secondary': '#A5B4D4',
+                        'warm-accent': '#A5D4B5',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.8s ease-in-out',
+                        'slide-up': 'slideUp 0.8s ease-out',
+                        'bounce-soft': 'bounceSoft 1s ease-in-out',
+                        'flip': 'flip 1.2s ease-in-out',
+                        'grow': 'grow 1.2s ease-out',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-soft': 'pulseSoft 4s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        bounceSoft: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.03)' },
+                        },
+                        flip: {
+                            '0%': { transform: 'perspective(400px) rotateY(0deg)' },
+                            '50%': { transform: 'perspective(400px) rotateY(90deg)' },
+                            '100%': { transform: 'perspective(400px) rotateY(0deg)' },
+                        },
+                        grow: {
+                            '0%': { transform: 'scale(0.85)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        pulseSoft: {
+                            '0%, 100%': { opacity: '0.8' },
+                            '50%': { opacity: '1' },
+                        },
+                    },
+                },
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass {
+                background: rgba(255, 255, 255, 0.55);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+            }
+            .glass-dark {
+                background: rgba(255, 255, 255, 0.75);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, #FDF8F3 0%, #F8E8E8 35%, #E8F0F5 70%, #E8F5E9 100%);
+                background-size: 300% 300%;
+                animation: gradientShift 25s ease infinite;
+            }
+            .card-shadow {
+                box-shadow: 0 8px 32px rgba(212, 165, 165, 0.12);
+            }
+            .btn-hover {
+                transition: all 0.4s ease;
+            }
+            .btn-hover:hover {
+                transform: translateY(-3px) scale(1.01);
+                box-shadow: 0 12px 36px rgba(212, 165, 165, 0.2);
+            }
+            .page-section {
+                display: none;
+                animation: fadeIn 0.6s ease-in-out;
+            }
+            .page-section.active {
+                display: block;
+            }
+            .scroll-reveal {
+                opacity: 0;
+                transform: translateY(20px);
+                transition: all 0.8s ease-out;
+            }
+            .scroll-reveal.revealed {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            .text-balance {
+                text-wrap: balance;
+            }
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* 抽卡翻转动画 */
+        .card-flip {
+            perspective: 1200px;
+        }
+        .card-flip-inner {
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .card-flip.flipped .card-flip-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FDF8F3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #D4A5A5, #A5B4D4);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen font-sans">
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/30">
+        <div class="max-w-6xl mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🌸</span>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-warm-primary to-warm-secondary bg-clip-text text-transparent">
+                        FocusFlow · 专注当下
+                    </h1>
+                </div>
+                
+                <!-- 桌面端导航 -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <button onclick="showPage('home')" class="nav-btn px-4 py-2 rounded-full text-sm font-medium transition-all hover:bg-soft-pink/60" data-page="home">
+                        🏠 首页
+                    </button>
+                    <button onclick="showPage('collect')" class="nav-btn px-4 py-2 rounded-full text-sm font-medium transition-all hover:bg-soft-blue/60" data-page="collect">
+                        ✨ 记录成就
+                    </button>
+                    <button onclick="showPage('recharge')" class="nav-btn px-4 py-2 rounded-full text-sm font-medium transition-all hover:bg-soft-pink/60" data-page="recharge">
+                        💛 汲取力量
+                    </button>
+                    <button onclick="showPage('wall')" class="nav-btn px-4 py-2 rounded-full text-sm font-medium transition-all hover:bg-soft-pink/60" data-page="wall">
+                        📋 成就墙
+                    </button>
+                    <button onclick="showPage('timeline')" class="nav-btn px-4 py-2 rounded-full text-sm font-medium transition-all hover:bg-soft-blue/60" data-page="timeline">
+                        📈 成长轨迹
+                    </button>
+                </div>
+                
+                <!-- 移动端汉堡按钮 -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg hover:bg-white/30 transition-all">
+                    <i class="fa fa-bars text-lg text-gray-500"></i>
+                </button>
+            </div>
+            
+            <!-- 移动端菜单 -->
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-2 space-y-2">
+                <button onclick="showPage('home'); toggleMobileMenu();" class="w-full text-left px-4 py-2 rounded-lg hover:bg-soft-pink/50 transition-all">
+                    🏠 首页
+                </button>
+                <button onclick="showPage('collect'); toggleMobileMenu();" class="w-full text-left px-4 py-2 rounded-lg hover:bg-soft-blue/50 transition-all">
+                    ✨ 记录成就
+                </button>
+                <button onclick="showPage('recharge'); toggleMobileMenu();" class="w-full text-left px-4 py-2 rounded-lg hover:bg-soft-pink/50 transition-all">
+                    💛 汲取力量
+                </button>
+                <button onclick="showPage('wall'); toggleMobileMenu();" class="w-full text-left px-4 py-2 rounded-lg hover:bg-soft-pink/50 transition-all">
+                    📋 成就墙
+                </button>
+                <button onclick="showPage('timeline'); toggleMobileMenu();" class="w-full text-left px-4 py-2 rounded-lg hover:bg-soft-blue/50 transition-all">
+                    📈 成长轨迹
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="pt-20 pb-12 px-4 max-w-6xl mx-auto">
+        
+        <!-- ==================== 首页 - 专注当下 ==================== -->
+        <section id="page-home" class="page-section active">
+            <div class="text-center py-16 animate-fade-in">
+                <div class="text-7xl mb-6 animate-float">🌿</div>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-600 mb-4 text-balance">
+                    FocusFlow · 专注当下
+                </h2>
+                <p class="text-gray-500 text-lg mb-10 max-w-xl mx-auto leading-relaxed text-balance">
+                    专注当下的每一件小事，不必为未来焦虑<br>
+                    你当下的每一步，都在成为更好的自己 ✨
+                </p>
+                
+                <!-- 核心按钮 -->
+                <div class="flex flex-col sm:flex-row gap-5 justify-center mb-14">
+                    <button onclick="showPage('collect')" class="btn-hover px-8 py-4 bg-gradient-to-r from-soft-pink to-soft-blue rounded-2xl font-bold text-gray-600 text-lg card-shadow">
+                        ✨ 记录当下成就
+                    </button>
+                    <button onclick="showPage('recharge')" class="btn-hover px-8 py-4 bg-gradient-to-r from-soft-blue to-soft-green rounded-2xl font-bold text-gray-600 text-lg card-shadow">
+                        💛 汲取过往力量
+                    </button>
+                </div>
+                
+                <!-- 数据统计 - 只保留总成就数，移除焦虑指标 -->
+                <div class="max-w-md mx-auto mb-14">
+                    <div class="glass rounded-2xl p-8 card-shadow animate-slide-up">
+                        <div class="text-5xl mb-3">🏆</div>
+                        <div id="stat-total" class="text-4xl font-bold bg-gradient-to-r from-warm-primary to-warm-secondary bg-clip-text text-transparent">0</div>
+                        <div class="text-gray-500 mt-1">已记录的小成就</div>
+                    </div>
+                </div>
+                
+                <!-- 治愈系文案卡片 -->
+                <div class="glass rounded-2xl p-8 max-w-xl mx-auto card-shadow animate-slide-up" style="animation-delay: 0.2s">
+                    <div class="space-y-4 text-gray-500 leading-relaxed">
+                        <p class="text-lg animate-pulse-soft">今天也辛苦了，你做得很好 ✨</p>
+                        <p>不必急于成长，每一步都算数 🌱</p>
+                        <p>先做好眼前这一件事就好 💫</p>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-white/40">
+                        <p class="text-gray-400 text-sm">
+                            💛 当你感到迷茫或疲惫时，来「汲取过往力量」看看曾经闪闪发光的自己吧
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 记录成就页面 ==================== -->
+        <section id="page-collect" class="page-section">
+            <div class="max-w-3xl mx-auto py-8">
+                <div class="text-center mb-8">
+                    <div class="text-5xl mb-4">✨</div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-600 mb-2">记录当下的小成就</h2>
+                    <p class="text-gray-500">每一份努力都值得被看见，每一次进步都弥足珍贵</p>
+                </div>
+                
+                <form id="achievementForm" class="space-y-6">
+                    <!-- 步骤1：成就标题 -->
+                    <div class="glass rounded-2xl p-6 card-shadow">
+                        <h3 class="font-bold text-lg mb-4 flex items-center text-gray-600">
+                            <span class="w-8 h-8 rounded-full bg-soft-pink flex items-center justify-center mr-3 text-sm">1</span>
+                            成就标题 🎯
+                        </h3>
+                        <input type="text" id="achievementTitle" placeholder="用一句话概括你的小成就（如：完成了XX任务）"
+                            class="w-full px-4 py-3 rounded-xl border border-soft-pink/50 focus:border-warm-primary focus:ring-2 focus:ring-soft-pink/30 outline-none transition-all bg-white/70 text-gray-600">
+                    </div>
+                    
+                    <!-- 步骤2：STAR原则 -->
+                    <div class="glass rounded-2xl p-6 card-shadow">
+                        <h3 class="font-bold text-lg mb-4 flex items-center text-gray-600">
+                            <span class="w-8 h-8 rounded-full bg-soft-blue flex items-center justify-center mr-3 text-sm">2</span>
+                            详细记录 📝
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-2">
+                                    <span class="text-warm-secondary font-bold">S</span> 情境 - 当时是什么情况？
+                                </label>
+                                <textarea id="situation" rows="2" placeholder="描述当时的背景..."
+                                    class="w-full px-4 py-3 rounded-xl border border-soft-blue/50 focus:border-warm-secondary focus:ring-2 focus:ring-soft-blue/30 outline-none transition-all bg-white/70 resize-none text-gray-600"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-2">
+                                    <span class="text-warm-secondary font-bold">T</span> 任务 - 你需要完成什么？
+                                </label>
+                                <textarea id="task" rows="2" placeholder="描述你的目标..."
+                                    class="w-full px-4 py-3 rounded-xl border border-soft-blue/50 focus:border-warm-secondary focus:ring-2 focus:ring-soft-blue/30 outline-none transition-all bg-white/70 resize-none text-gray-600"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-2">
+                                    <span class="text-warm-secondary font-bold">A</span> 行动 - 你具体做了什么？
+                                </label>
+                                <textarea id="action" rows="3" placeholder="详细描述你采取的行动..."
+                                    class="w-full px-4 py-3 rounded-xl border border-soft-blue/50 focus:border-warm-secondary focus:ring-2 focus:ring-soft-blue/30 outline-none transition-all bg-white/70 resize-none text-gray-600"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-2">
+                                    <span class="text-warm-secondary font-bold">R</span> 结果 - 最终结果如何？
+                                </label>
+                                <textarea id="result" rows="2" placeholder="描述最终的成果和收获..."
+                                    class="w-full px-4 py-3 rounded-xl border border-soft-blue/50 focus:border-warm-secondary focus:ring-2 focus:ring-soft-blue/30 outline-none transition-all bg-white/70 resize-none text-gray-600"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 步骤3：复盘思考 - 深度联结复盘 -->
+                    <div class="glass rounded-2xl p-6 card-shadow">
+                        <h3 class="font-bold text-lg mb-4 flex items-center text-gray-600">
+                            <span class="w-8 h-8 rounded-full bg-soft-green flex items-center justify-center mr-3 text-sm">3</span>
+                            复盘思考 💎
+                        </h3>
+                        
+                        <div class="bg-soft-green/40 border border-warm-accent/30 rounded-xl p-5 mb-5">
+                            <p class="text-gray-600 leading-relaxed">
+                                <strong>🧠 深度联结复盘</strong><br><br>
+                                请把今天这件事带给你的成就感和领悟，<br>
+                                <strong>联结到你过往的某一段真实经历中</strong>——<br>
+                                如果用这次领悟回看过去，你会有什么新的发现？<br><br>
+                                再试着用<strong>第一性原理</strong>思考：<br>
+                                这件事成功的本质是什么？<br>
+                                这个本质规律，还能解释你生命中的哪些经历？<br>
+                                让这个领悟在你心中扎根、深化，成为你真正的智慧 💎
+                            </p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-2">
+                                    🤔 联结过往 + 本质思考
+                                </label>
+                                <textarea id="reflection1" rows="4" placeholder="把这次的领悟和你的过往经历联结起来，用第一性原理思考成功的本质..."
+                                    class="w-full px-4 py-3 rounded-xl border border-soft-green/50 focus:border-warm-accent focus:ring-2 focus:ring-soft-green/30 outline-none transition-all bg-white/70 resize-none text-gray-600"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-2">
+                                    🔮 想对未来的自己说什么
+                                </label>
+                                <textarea id="reflection2" rows="2" placeholder="给未来的自己留一句话..."
+                                    class="w-full px-4 py-3 rounded-xl border border-soft-green/50 focus:border-warm-accent focus:ring-2 focus:ring-soft-green/30 outline-none transition-all bg-white/70 resize-none text-gray-600"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 标签选择 -->
+                    <div class="glass rounded-2xl p-6 card-shadow">
+                        <h3 class="font-bold text-lg mb-4 text-gray-600">🏷️ 能力标签（可多选）</h3>
+                        <div class="flex flex-wrap gap-2" id="tagSelector">
+                            <button type="button" class="tag-btn px-4 py-2 rounded-full text-sm bg-soft-pink/50 hover:bg-soft-pink transition-all text-gray-600" data-tag="沟通能力">沟通能力</button>
+                            <button type="button" class="tag-btn px-4 py-2 rounded-full text-sm bg-soft-blue/50 hover:bg-soft-blue transition-all text-gray-600" data-tag="解决问题">解决问题</button>
+                            <button type="button" class="tag-btn px-4 py-2 rounded-full text-sm bg-soft-pink/50 hover:bg-soft-pink transition-all text-gray-600" data-tag="领导力">领导力</button>
+                            <button type="button" class="tag-btn px-4 py-2 rounded-full text-sm bg-soft-blue/50 hover:bg-soft-blue transition-all text-gray-600" data-tag="技术能力">技术能力</button>
+                            <button type="button" class="tag-btn px-4 py-2 rounded-full text-sm bg-soft-pink/50 hover:bg-soft-pink transition-all text-gray-600" data-tag="创造力">创造力</button>
+                            <button type="button" class="tag-btn px-4 py-2 rounded-full text-sm bg-soft-blue/50 hover:bg-soft-blue transition-all text-gray-600" data-tag="执行力">执行力</button>
+                            <button type="button" class="tag-btn px-4 py-2 rounded-full text-sm bg-soft-pink/50 hover:bg-soft-pink transition-all text-gray-600" data-tag="学习能力">学习能力</button>
+                            <button type="button" class="tag-btn px-4 py-2 rounded-full text-sm bg-soft-blue/50 hover:bg-soft-blue transition-all text-gray-600" data-tag="团队协作">团队协作</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 提交按钮 -->
+                    <button type="submit" id="saveBtn" class="w-full btn-hover py-4 bg-gradient-to-r from-warm-primary via-warm-secondary to-warm-accent rounded-2xl font-bold text-white text-lg card-shadow">
+                        💫 保存这份美好
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ==================== 汲取力量页面 - 自动抽卡 ==================== -->
+        <section id="page-recharge" class="page-section">
+            <div class="max-w-3xl mx-auto py-8">
+                <div class="text-center mb-8">
+                    <div class="text-5xl mb-4">💛</div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-600 mb-2">汲取过往力量</h2>
+                    <p class="text-gray-500">迷茫时，看看曾经闪闪发光的自己 ✨</p>
+                </div>
+                
+                <!-- 抽卡区域 - 移除所有选择环节，直接展示结果 -->
+                <div class="flex justify-center mb-8">
+                    <div id="cardContainer" class="card-flip w-full max-w-md h-80 cursor-pointer">
+                        <div class="card-flip-inner relative w-full h-full">
+                            <!-- 卡片正面（背面） -->
+                            <div class="card-front absolute w-full h-full glass-dark rounded-3xl card-shadow flex flex-col items-center justify-center p-8">
+                                <div class="text-6xl mb-4 animate-float">🎴</div>
+                                <p class="text-xl font-bold text-gray-500">正在为你抽取...</p>
+                                <p class="text-sm text-gray-400 mt-2">来自过去的力量</p>
+                            </div>
+                            <!-- 卡片背面（正面内容） -->
+                            <div id="cardContent" class="card-back absolute w-full h-full glass-dark rounded-3xl card-shadow p-6 overflow-y-auto">
+                                <!-- 动态内容 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 空状态提示 -->
+                <div id="emptyRecharge" class="text-center hidden">
+                    <div class="glass rounded-2xl p-8 max-w-md mx-auto card-shadow">
+                        <div class="text-5xl mb-4">🌱</div>
+                        <p class="text-gray-500 mb-4">还没有记录哦</p>
+                        <p class="text-gray-400 text-sm mb-6">先去记录你的第一个小成就吧！</p>
+                        <button onclick="showPage('collect')" class="btn-hover px-6 py-3 bg-gradient-to-r from-soft-pink to-soft-blue rounded-xl font-medium text-gray-600">
+                            ✨ 去记录成就
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 鼓励文案 -->
+                <div id="encourageText" class="text-center hidden mb-6">
+                    <p class="text-xl font-medium text-gray-500 animate-bounce-soft">
+                        你看，你一直都这么棒！💪
+                    </p>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <div id="rechargeActions" class="text-center hidden">
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="drawRandomCard()" class="btn-hover px-8 py-3 bg-gradient-to-r from-soft-pink to-soft-blue rounded-xl font-bold text-gray-600 card-shadow">
+                            🔄 再抽一张
+                        </button>
+                        <button onclick="viewCurrentCardDetail()" id="viewDetailBtn" class="btn-hover px-8 py-3 bg-gradient-to-r from-soft-blue to-soft-green rounded-xl font-bold text-gray-600 card-shadow">
+                            📖 查看完整记录
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 底部温暖提示 -->
+                <div class="text-center mt-10 text-gray-400 text-sm">
+                    <p>💛 过去的你已经很棒了，现在的你也在努力，未来的你会更好</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 成就墙页面 ==================== -->
+        <section id="page-wall" class="page-section">
+            <div class="max-w-5xl mx-auto py-8">
+                <div class="text-center mb-8">
+                    <div class="text-5xl mb-4">📋</div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-600 mb-2">成就墙</h2>
+                    <p class="text-gray-500">这里记录着你的每一次闪耀时刻 ✨</p>
+                </div>
+                
+                <!-- 搜索和筛选 -->
+                <div class="glass rounded-2xl p-4 card-shadow mb-6">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1">
+                            <div class="relative">
+                                <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="searchAchievements" placeholder="搜索成就..."
+                                    class="w-full pl-10 pr-4 py-2 rounded-xl border border-soft-pink/50 focus:border-warm-primary focus:ring-2 focus:ring-soft-pink/30 outline-none transition-all bg-white/70 text-gray-600">
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="filterByTag('all')" class="filter-tag-btn px-3 py-1 rounded-full text-sm bg-warm-primary text-white transition-all" data-tag="all">全部</button>
+                            <button onclick="filterByTag('沟通能力')" class="filter-tag-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-500 transition-all" data-tag="沟通能力">沟通</button>
+                            <button onclick="filterByTag('解决问题')" class="filter-tag-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-500 transition-all" data-tag="解决问题">解决问题</button>
+                            <button onclick="filterByTag('领导力')" class="filter-tag-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-500 transition-all" data-tag="领导力">领导力</button>
+                            <button onclick="filterByTag('技术能力')" class="filter-tag-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-500 transition-all" data-tag="技术能力">技术</button>
+                            <button onclick="filterByTag('创造力')" class="filter-tag-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-500 transition-all" data-tag="创造力">创造力</button>
+                            <button onclick="filterByTag('执行力')" class="filter-tag-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-500 transition-all" data-tag="执行力">执行力</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 成就卡片网格 -->
+                <div id="achievementsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- 动态渲染成就卡片 -->
+                </div>
+                
+                <!-- 空状态 -->
+                <div id="emptyWall" class="text-center py-12 hidden">
+                    <div class="text-6xl mb-4">🌱</div>
+                    <p class="text-gray-400 text-lg">还没有记录任何成就</p>
+                    <button onclick="showPage('collect')" class="mt-4 btn-hover px-6 py-2 bg-gradient-to-r from-soft-pink to-soft-blue rounded-xl font-medium text-gray-600">
+                        记录第一个小成就 ✨
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 成长轨迹页面 ==================== -->
+        <section id="page-timeline" class="page-section">
+            <div class="max-w-3xl mx-auto py-8">
+                <div class="text-center mb-8">
+                    <div class="text-5xl mb-4">📈</div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-600 mb-2">成长轨迹</h2>
+                    <p class="text-gray-500">时间会见证你的每一步成长 🌟</p>
+                </div>
+                
+                <!-- 时间线 -->
+                <div id="timelineContainer" class="relative">
+                    <!-- 时间线竖线 -->
+                    <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-warm-primary via-warm-secondary to-warm-accent"></div>
+                    
+                    <!-- 时间线内容（动态渲染） -->
+                    <div id="timelineContent">
+                    </div>
+                </div>
+                
+                <!-- 空状态 -->
+                <div id="emptyTimeline" class="text-center py-12 hidden">
+                    <div class="text-6xl mb-4">🚀</div>
+                    <p class="text-gray-400 text-lg">你的成长故事即将开始...</p>
+                    <button onclick="showPage('collect')" class="mt-4 btn-hover px-6 py-2 bg-gradient-to-r from-soft-pink to-soft-blue rounded-xl font-medium text-gray-600">
+                        写下第一个成就 🌱
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 成就详情弹窗 -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/10 backdrop-blur-sm">
+        <div class="glass-dark rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto card-shadow animate-grow">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 id="modalTitle" class="text-xl font-bold text-gray-600"></h3>
+                    <button onclick="closeModal()" class="p-2 hover:bg-gray-100 rounded-full transition-all">
+                        <i class="fa fa-times text-gray-400"></i>
+                    </button>
+                </div>
+                <div id="modalContent" class="space-y-4">
+                    <!-- 动态内容 -->
+                </div>
+                <div class="flex gap-3 mt-6 pt-4 border-t border-gray-100">
+                    <button onclick="deleteAchievement()" class="px-4 py-2 bg-red-50 text-red-400 rounded-xl hover:bg-red-100 transition-all">
+                        <i class="fa fa-trash mr-1"></i> 删除
+                    </button>
+                    <button onclick="closeModal()" class="px-4 py-2 bg-gray-100 text-gray-500 rounded-xl hover:bg-gray-200 transition-all ml-auto">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成功提示弹窗 -->
+    <div id="successModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/10 backdrop-blur-sm">
+        <div class="glass-dark rounded-2xl max-w-md w-full card-shadow animate-grow p-8 text-center">
+            <div class="text-6xl mb-4">🎉</div>
+            <h3 class="text-2xl font-bold text-gray-600 mb-2">太棒了！</h3>
+            <p class="text-gray-500 mb-6">又一份美好被妥善珍藏 ✨</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeSuccessModalAndStay()" class="px-6 py-3 bg-gray-100 text-gray-500 rounded-xl hover:bg-gray-200 transition-all">
+                    继续记录
+                </button>
+                <button onclick="closeSuccessModalAndGo()" class="px-6 py-3 bg-gradient-to-r from-warm-primary to-warm-secondary text-white rounded-xl hover:opacity-90 transition-all">
+                    查看成就墙
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 数据管理 - 保持兼容性 ====================
+        const STORAGE_KEY = 'focusflow_data_v2';
+        
+        // 默认示例数据
+        const DEFAULT_DATA = {
+            achievements: [
+                {
+                    id: '1',
+                    title: '完成了一个重要的项目交付',
+                    situation: '项目截止日期临近，团队面临较大压力',
+                    task: '负责核心模块的开发和整合',
+                    action: '制定了详细的开发计划，每天跟进进度，主动帮助团队成员解决技术难题',
+                    result: '项目提前2天交付，获得客户好评，团队士气高涨',
+                    reflection: '想起了上次做类似项目时也是这样一步步拆解问题。这次的经验可以迁移到未来的项目管理中',
+                    tags: ['执行力', '解决问题', '团队协作'],
+                    createdAt: Date.now() - 86400000 * 3
+                },
+                {
+                    id: '2',
+                    title: '成功主导了一次团队分享会',
+                    situation: '团队需要知识分享来提升整体能力',
+                    task: '准备并主持关于新技术的分享',
+                    action: '花了一周时间准备材料，设计了互动环节，用生动的案例讲解',
+                    result: '参与度很高，大家反馈收获满满，后续有3个同事应用了分享的内容',
+                    reflection: '发现自己很擅长把复杂的东西讲清楚，这个能力可以用在更多的沟通场景',
+                    tags: ['沟通能力', '领导力'],
+                    createdAt: Date.now() - 86400000 * 2
+                },
+                {
+                    id: '3',
+                    title: '自学掌握了新的技术框架',
+                    situation: '项目需要用到新的技术，之前没有接触过',
+                    task: '快速学习并应用到项目中',
+                    action: '每天花2小时看文档和教程，做了很多小demo，遇到问题查资料和请教',
+                    result: '两周内掌握并成功应用，代码质量得到认可',
+                    reflection: '学习能力是可以刻意练习的，这次用了费曼学习法效果很好，这个方法值得迁移到其他学习中',
+                    tags: ['学习能力', '技术能力'],
+                    createdAt: Date.now() - 86400000
+                },
+                {
+                    id: '4',
+                    title: '提出创新方案优化了现有流程',
+                    situation: '现有工作流程效率低，重复劳动多',
+                    task: '找到优化方案并推动落地',
+                    action: '分析了整个流程的瓶颈，设计了自动化脚本，说服团队采纳',
+                    result: '工作效率提升50%，每周节省5小时重复劳动',
+                    reflection: '跳出固有思维很重要，第一性原理帮我重新思考问题本质，这种思维方式可以应用到更多场景',
+                    tags: ['创造力', '解决问题'],
+                    createdAt: Date.now()
+                }
+            ],
+            stats: {
+                totalAchievements: 4
+            }
+        };
+
+        // 状态管理
+        let appData = null;
+        let selectedTags = [];
+        let currentFilterTag = 'all';
+        let currentDetailId = null;
+        let currentDrawnCardId = null;
+
+        // 初始化
+        function init() {
+            loadData();
+            updateStats();
+            renderAchievementsWall();
+            renderTimeline();
+            setupEventListeners();
+            updateNavState('home');
+        }
+
+        // 加载数据
+        function loadData() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    appData = JSON.parse(stored);
+                    console.log('数据加载成功:', appData.achievements.length, '条成就');
+                } else {
+                    appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                    saveData();
+                    console.log('使用默认数据初始化');
+                }
+            } catch (e) {
+                console.error('数据加载失败:', e);
+                appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+            }
+        }
+
+        // 保存数据
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+                console.log('数据保存成功:', appData.achievements.length, '条成就');
+                return true;
+            } catch (e) {
+                console.error('数据保存失败:', e);
+                alert('保存失败，请检查浏览器存储权限');
+                return false;
+            }
+        }
+
+        // ==================== 页面切换 ====================
+        function showPage(pageName) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            // 显示目标页面
+            document.getElementById(`page-${pageName}`).classList.add('active');
+            // 更新导航状态
+            updateNavState(pageName);
+            
+            // 页面特定的更新
+            if (pageName === 'home') updateStats();
+            if (pageName === 'wall') renderAchievementsWall();
+            if (pageName === 'timeline') renderTimeline();
+            if (pageName === 'recharge') {
+                // 进入汲取力量页面，延迟后自动抽卡
+                setTimeout(() => {
+                    autoDrawCard();
+                }, 500);
+            }
+            
+            // 滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateNavState(pageName) {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.dataset.page === pageName) {
+                    btn.classList.add('bg-white/50', 'font-semibold');
+                } else {
+                    btn.classList.remove('bg-white/50', 'font-semibold');
+                }
+            });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // ==================== 首页统计 - 只保留总成就数 ====================
+        function updateStats() {
+            document.getElementById('stat-total').textContent = appData.achievements.length;
+        }
+
+        // ==================== 收集能量 - 表单提交 ====================
+        function setupEventListeners() {
+            // 表单提交
+            const form = document.getElementById('achievementForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    saveAchievement();
+                });
+            }
+
+            // 保存按钮单独绑定点击事件
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    saveAchievement();
+                });
+            }
+
+            // 标签选择
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tag = this.dataset.tag;
+                    this.classList.toggle('bg-warm-primary');
+                    this.classList.toggle('text-white');
+                    
+                    if (selectedTags.includes(tag)) {
+                        selectedTags = selectedTags.filter(t => t !== tag);
+                    } else {
+                        selectedTags.push(tag);
+                    }
+                });
+            });
+
+            // 搜索
+            const searchInput = document.getElementById('searchAchievements');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    renderAchievementsWall();
+                });
+            }
+        }
+
+        function saveAchievement() {
+            // 简化验证 - 只验证标题
+            const title = document.getElementById('achievementTitle').value.trim();
+            if (!title) {
+                alert('请填写成就标题！');
+                return;
+            }
+
+            const achievement = {
+                id: Date.now().toString(),
+                title: title,
+                situation: document.getElementById('situation').value || '',
+                task: document.getElementById('task').value || '',
+                action: document.getElementById('action').value || '',
+                result: document.getElementById('result').value || '',
+                reflection: (document.getElementById('reflection1').value || '') + '\n' + (document.getElementById('reflection2').value || ''),
+                tags: [...selectedTags],
+                createdAt: Date.now()
+            };
+
+            appData.achievements.unshift(achievement);
+            appData.stats.totalAchievements = appData.achievements.length;
+            
+            // 保存数据
+            const saveSuccess = saveData();
+            if (!saveSuccess) {
+                console.error('数据写入失败');
+                return;
+            }
+
+            // 重置表单
+            document.getElementById('achievementForm').reset();
+            selectedTags = [];
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.classList.remove('bg-warm-primary', 'text-white');
+            });
+
+            // 显示成功弹窗
+            showSuccessModal();
+            updateStats();
+        }
+
+        function showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeSuccessModalAndStay() {
+            const modal = document.getElementById('successModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeSuccessModalAndGo() {
+            const modal = document.getElementById('successModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            showPage('wall');
+        }
+
+        // ==================== 汲取力量 - 自动抽卡 ====================
+        function autoDrawCard() {
+            // 检查是否有成就
+            if (appData.achievements.length === 0) {
+                document.getElementById('cardContainer').classList.add('hidden');
+                document.getElementById('emptyRecharge').classList.remove('hidden');
+                return;
+            }
+            
+            document.getElementById('emptyRecharge').classList.add('hidden');
+            document.getElementById('cardContainer').classList.remove('hidden');
+            
+            // 延迟后自动翻转并显示内容
+            setTimeout(() => {
+                drawRandomCard();
+            }, 800);
+        }
+
+        function drawRandomCard() {
+            if (appData.achievements.length === 0) {
+                return;
+            }
+            
+            const container = document.getElementById('cardContainer');
+            
+            // 如果已经翻转了，先翻回去
+            if (container.classList.contains('flipped')) {
+                container.classList.remove('flipped');
+                document.getElementById('encourageText').classList.add('hidden');
+                document.getElementById('rechargeActions').classList.add('hidden');
+                
+                setTimeout(() => {
+                    performDraw();
+                }, 600);
+            } else {
+                performDraw();
+            }
+        }
+
+        function performDraw() {
+            const container = document.getElementById('cardContainer');
+            const randomAchievement = appData.achievements[Math.floor(Math.random() * appData.achievements.length)];
+            currentDrawnCardId = randomAchievement.id;
+            
+            // 填充内容
+            document.getElementById('cardContent').innerHTML = `
+                <div class="h-full flex flex-col">
+                    <div class="text-center mb-4">
+                        <span class="text-3xl">🌟</span>
+                    </div>
+                    <h4 class="text-lg font-bold text-gray-600 mb-3 text-center">${randomAchievement.title}</h4>
+                    <div class="flex-1 overflow-y-auto text-sm text-gray-500 space-y-2">
+                        ${randomAchievement.result ? `<p><strong>成果：</strong>${randomAchievement.result}</p>` : ''}
+                        ${randomAchievement.action ? `<p><strong>行动：</strong>${randomAchievement.action.substring(0, 100)}...</p>` : ''}
+                    </div>
+                    <div class="flex flex-wrap gap-1 mt-3">
+                        ${randomAchievement.tags.map(tag => `<span class="px-2 py-0.5 bg-soft-pink/50 rounded-full text-xs text-gray-500">${tag}</span>`).join('')}
+                    </div>
+                    <div class="text-xs text-gray-400 mt-2 text-center">
+                        ${new Date(randomAchievement.createdAt).toLocaleDateString('zh-CN')}
+                    </div>
+                </div>
+            `;
+            
+            // 翻转动画
+            container.classList.add('flipped');
+            
+            // 显示鼓励文案和操作按钮
+            setTimeout(() => {
+                document.getElementById('encourageText').classList.remove('hidden');
+                document.getElementById('rechargeActions').classList.remove('hidden');
+            }, 1000);
+        }
+
+        function viewCurrentCardDetail() {
+            if (currentDrawnCardId) {
+                showDetail(currentDrawnCardId);
+            }
+        }
+
+        // ==================== 成就墙 ====================
+        function renderAchievementsWall() {
+            const grid = document.getElementById('achievementsGrid');
+            const empty = document.getElementById('emptyWall');
+            const searchTerm = document.getElementById('searchAchievements').value.toLowerCase();
+            
+            let filtered = appData.achievements;
+            
+            // 标签筛选
+            if (currentFilterTag !== 'all') {
+                filtered = filtered.filter(a => a.tags.includes(currentFilterTag));
+            }
+            
+            // 搜索筛选
+            if (searchTerm) {
+                filtered = filtered.filter(a => 
+                    a.title.toLowerCase().includes(searchTerm) ||
+                    (a.result && a.result.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            
+            empty.classList.add('hidden');
+            
+            grid.innerHTML = filtered.map((a, i) => {
+                return `
+                    <div class="glass rounded-xl p-5 card-shadow hover:scale-105 transition-all cursor-pointer scroll-reveal"
+                         onclick="showDetail('${a.id}')" style="animation-delay: ${i * 0.1}s">
+                        <div class="flex items-start justify-between mb-3">
+                            <h4 class="font-bold text-gray-600 flex-1">${a.title}</h4>
+                            <span class="text-xl ml-2">✨</span>
+                        </div>
+                        <p class="text-sm text-gray-500 line-clamp-2 mb-3">
+                            ${a.result || a.action || '点击查看详情'}
+                        </p>
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            ${a.tags.slice(0, 2).map(tag => `
+                                <span class="px-2 py-0.5 bg-soft-pink/50 rounded-full text-xs text-gray-500">${tag}</span>
+                            `).join('')}
+                            ${a.tags.length > 2 ? `<span class="px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-400">+${a.tags.length - 2}</span>` : ''}
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            ${new Date(a.createdAt).toLocaleDateString('zh-CN')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // 触发滚动显示动画
+            setTimeout(() => {
+                document.querySelectorAll('.scroll-reveal').forEach(el => {
+                    el.classList.add('revealed');
+                });
+            }, 100);
+        }
+
+        function filterByTag(tag) {
+            currentFilterTag = tag;
+            document.querySelectorAll('.filter-tag-btn').forEach(btn => {
+                if (btn.dataset.tag === tag) {
+                    btn.className = 'filter-tag-btn px-3 py-1 rounded-full text-sm bg-warm-primary text-white transition-all';
+                } else {
+                    btn.className = 'filter-tag-btn px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-500 transition-all';
+                }
+            });
+            renderAchievementsWall();
+        }
+
+        // ==================== 成长轨迹 - 时间线 ====================
+        function renderTimeline() {
+            const container = document.getElementById('timelineContent');
+            const empty = document.getElementById('emptyTimeline');
+            
+            if (appData.achievements.length === 0) {
+                container.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            
+            empty.classList.add('hidden');
+            
+            const sorted = [...appData.achievements].sort((a, b) => b.createdAt - a.createdAt);
+            
+            container.innerHTML = sorted.map((a, i) => {
+                const isLeft = i % 2 === 0;
+                
+                return `
+                    <div class="relative pl-12 md:pl-0 mb-8 scroll-reveal" style="animation-delay: ${i * 0.1}s">
+                        <div class="md:flex ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} items-center">
+                            <!-- 内容 -->
+                            <div class="md:w-1/2 ${isLeft ? 'md:pr-12 md:text-right' : 'md:pl-12'}">
+                                <div class="glass rounded-xl p-4 card-shadow inline-block text-left cursor-pointer hover:scale-102 transition-all"
+                                     onclick="showDetail('${a.id}')">
+                                    <h4 class="font-bold text-gray-600 mb-2">${a.title}</h4>
+                                    <p class="text-sm text-gray-500 line-clamp-2">
+                                        ${a.result || a.action || '点击查看完整记录'}
+                                    </p>
+                                    <div class="flex flex-wrap gap-1 mt-2">
+                                        ${a.tags.slice(0, 3).map(tag => `
+                                            <span class="px-2 py-0.5 bg-soft-pink/50 rounded-full text-xs text-gray-500">${tag}</span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 时间点 -->
+                            <div class="absolute left-2 md:left-1/2 md:-translate-x-1/2 w-5 h-5 rounded-full bg-warm-primary border-4 border-white shadow-lg z-10"></div>
+                            <!-- 时间 -->
+                            <div class="md:w-1/2 ${isLeft ? 'md:pl-12' : 'md:pr-12 md:text-right'} hidden md:block">
+                                <span class="text-sm text-gray-500 font-medium">
+                                    ${new Date(a.createdAt).toLocaleDateString('zh-CN', {year: 'numeric', month: 'long', day: 'numeric'})}
+                                </span>
+                            </div>
+                        </div>
+                        <!-- 移动端时间 -->
+                        <div class="md:hidden text-xs text-gray-400 mt-2 ml-2">
+                            ${new Date(a.createdAt).toLocaleDateString('zh-CN')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // 触发动画
+            setTimeout(() => {
+                document.querySelectorAll('.scroll-reveal').forEach(el => {
+                    el.classList.add('revealed');
+                });
+            }, 100);
+        }
+
+        // ==================== 详情弹窗 ====================
+        function showDetail(id) {
+            currentDetailId = id;
+            const achievement = appData.achievements.find(a => a.id === id);
+            if (!achievement) return;
+            
+            document.getElementById('modalTitle').textContent = achievement.title;
+            document.getElementById('modalContent').innerHTML = `
+                <div class="space-y-4">
+                    ${achievement.situation ? `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">📌 情境</label>
+                        <p class="text-gray-600">${achievement.situation}</p>
+                    </div>` : ''}
+                    
+                    ${achievement.task ? `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">🎯 任务</label>
+                        <p class="text-gray-600">${achievement.task}</p>
+                    </div>` : ''}
+                    
+                    ${achievement.action ? `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">💪 行动</label>
+                        <p class="text-gray-600">${achievement.action}</p>
+                    </div>` : ''}
+                    
+                    ${achievement.result ? `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">🏆 结果</label>
+                        <p class="text-gray-600">${achievement.result}</p>
+                    </div>` : ''}
+                    
+                    ${achievement.reflection ? `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-1">💎 复盘思考</label>
+                        <p class="text-gray-600">${achievement.reflection}</p>
+                    </div>` : ''}
+                    
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        ${achievement.tags.map(tag => `
+                            <span class="px-3 py-1 bg-soft-pink/50 rounded-full text-sm text-gray-500">${tag}</span>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="text-sm text-gray-400 pt-2 border-t border-gray-100">
+                        记录于：${new Date(achievement.createdAt).toLocaleString('zh-CN')}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('detailModal').classList.remove('hidden');
+            document.getElementById('detailModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.getElementById('detailModal').classList.remove('flex');
+            currentDetailId = null;
+        }
+
+        function deleteAchievement() {
+            if (!currentDetailId) return;
+            if (!confirm('确定要删除这条成就记录吗？')) return;
+            
+            appData.achievements = appData.achievements.filter(a => a.id !== currentDetailId);
+            saveData();
+            
+            closeModal();
+            renderAchievementsWall();
+            renderTimeline();
+            updateStats();
+        }
+
+        // 点击弹窗外部关闭
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSuccessModalAndStay();
+            }
+        });
+
+        // 初始化应用
+        window.addEventListener('DOMContentLoaded', function() {
+            init();
+        });
+        
+        // 立即初始化
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            init();
+        }
+    </script>
+</body>
+</html>
